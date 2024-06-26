@@ -24,20 +24,60 @@
       to properties must not have external references and all regex values are properly escaped.
       You can also pass values into the component via properties by using the element reference (history).
       -->
-    <deep-chat id="chat-element" demo="true" textInput='{"placeholder":{"text": "Welcome to the demo!"}}'></deep-chat>
+    <deep-chat id="chat-element" demo="true" textToSpeech="true" speechToText='{"webSpeech": true,"button": {"position": "outside-left"}}' textInput='{"placeholder":{"text": "Welcome to the demo!"}}'></deep-chat>
     <script type="module">
-      const chatElementRef = document.getElementById('chat-element');
-      // Setting value via a property (easiest way)
-      chatElementRef.history = [
-        {role: 'user', text: 'Hey, how are you today?'},
-        {role: 'ai', text: 'I am doing very well!'},
-      ];
-      chatElementRef.setAttribute(
-        'introMessage',
-        JSON.stringify({
-          text: 'You are now running deep chat locally.',
-        })
-      );
+		const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+		const chatElementRef = document.getElementById('chat-element');
+		// Setting value via a property (easiest way)
+		chatElementRef.history = [
+			{role: 'user', text: 'Hey, how are you today?'},
+			{role: 'ai', text: 'I am doing very well!'},
+		];
+		chatElementRef.setAttribute(
+			'introMessage',
+			JSON.stringify({
+				text: 'You are now running deep chat locally.',
+			})
+		);
+		chatElementRef.stream = true;
+		chatElementRef.request = {
+			handler: async (body, signals) => {
+				try {
+					const sentence = ['hi', 'how', 'are', 'you', 'doing', 'today?', 'I', "am", 'doing', 'very', 'good']
+					for (let i=0; 12 > i; i++) {
+						await sleep(100)
+						signals.onResponse({text: `${sentence[i]} `})
+					}
+					signals.onClose();
+				// this is PSEUDO CODE for creating a stream
+					// fetchEventSource('custom-url', {
+					// 	async onopen(response) {
+					// 		if (response.ok) {
+					// 			signals.onOpen(); // stops the loading bubble
+					// 		}
+					// 		else {
+					// 			signals.onResponse({error: 'error'}); // displays an error message
+					// 		}
+					// 	},
+					// 	onmessage(message) {
+					// 		signals.onResponse({text: message}); // adds text into the message bubble
+					// 	},
+					// 	onerror(message) {
+					// 		signals.onResponse({error: message}); // displays an error message
+					// 	},
+					// 	onclose() {
+					// 		signals.onClose(); // The stop button will be changed back to submit button
+					// 	},
+					// });
+					// triggered when the user clicks the stop button
+					// signals.stopClicked.listener = () => {
+					// 	// logic to stop your stream, such as creating an abortController
+					// };
+				} catch (e) {
+					signals.onResponse({error: 'error'}); // displays an error message
+				}
+			},
+		};
     </script>
   </body>
 </html>
