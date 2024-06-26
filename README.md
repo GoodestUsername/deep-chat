@@ -1,5 +1,8 @@
 <br />
 
+EDITS:
+Fork makes the stream text to speech activate on delimited sentences instead of only at the end.
+
 Update logos
 
 ![Deep Chat](./assets/readme/banner-2.png)
